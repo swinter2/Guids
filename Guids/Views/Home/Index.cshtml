@@ -8,11 +8,25 @@
         <title>Guids!</title>
         <link href="~/Content/stylesheets/screen.css" rel="stylesheet" media="screen"/>
     </head>
-    <body>
+    <body class="container" ng-app>
         
-        <div class="container" ng-app ng-controller="Guids">
-        
-            <h1>Guids!</h1>
+        <h1>Guids!</h1>
+
+        <div ng-controller="Guids">
+            
+            <fieldset>
+                <legend>Guid Recycling</legend>
+
+                <input type="text" name="guidToRecycle" ng-model="guidToRecycle" />
+                <button ng-click="recycle()">Recycle This Guid</button>
+                <p ng-show="error" class="error" ng-model="error">{{ error }}</p>
+
+            </fieldset>
+
+            <div class="results">
+                <h3>Recycled Guids</h3>
+                <p ng-repeat="guid in recycledGuids">{{ guid }}</p>
+            </div>
         
             <fieldset>
                 <legend>Guids</legend>
@@ -26,11 +40,11 @@
             </p>
         
             <div ng-show="guids" class="results">
-                <p ng-repeat="guid in guids">{{ guid }}</p>
+                <p ng-repeat="guid in guids">{{ guid }}<button class="button-copy" ng-click="copy()">Copy</button></p>
             </div>
 
         </div>
-        
+
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
         <script>
             typeof (angular) === 'undefined' && document.write("<script src='/Scripts/angular.min.js'></" + "script>");
@@ -41,13 +55,15 @@
         </script>
         <script src="~/Scripts/jquery-2.1.0.min.js"></script>
         <script>
+            var guidUrl = "@Url.HttpRouteUrl("DefaultApi", new { controller = "Guid" })?n=";
+            var guidPattern = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", 'i');
+
             function Guids($scope) {
                 $scope.guids = [];
                 $scope.num = 1;
 
-                $scope.fetch = function() {
-                    $.getJSON("@Url.HttpRouteUrl("DefaultApi", new { controller = "Guid" })?n=" + $scope.num,
-                        //{ n: $scope.num },
+                $scope.fetch = function () {
+                    $.getJSON(guidUrl + $scope.num,
                         null,
                         function (res) {
                             $scope.guids = [];
@@ -58,7 +74,26 @@
                         }
                     );
                 };
+
+                $scope.recycledGuids = [];
+                $scope.guidToRecycle = "";
+                $scope.error = "";
+
+                $scope.recycle = function () {
+                    if ($scope.guidToRecycle.match(guidPattern)) {
+                        $scope.recycledGuids.push($scope.guidToRecycle);
+                        $scope.guidToRecycle = "";
+                        $scope.error = "";
+                    } else {
+                        $scope.error = "Value entered must be a valid GUID.";
+                    }
+                };
+
+                $scope.copy = function () {
+                    $scope.guidToRecycle = this.guid;
+                };
             }
         </script>
+        
     </body>
 </html>
