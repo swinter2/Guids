@@ -1,0 +1,47 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <div>
+        
+        <h1>Guids!</h1>
+        
+        <div id="form">
+            <label>How many guids do you want to see?</label>
+            <input id="num" type="text" name="num"/>
+            
+            <button>See Guids!</button>
+        </div>
+        
+        <span id="results"></span>
+
+    </div>
+    <script src="~/Scripts/jquery-2.1.0.min.js"></script>
+    <script>
+        jQuery(function($) {
+            var $form = $("#form");
+            var $num = $form.find("#num");
+            var $results = $("#results");
+
+            $form.on('click', "button", function(e) {
+                var num = $num.val();
+                
+                $.post("@Url.HttpRouteUrl("DefaultApi", new { controller = "Guid", action="List" })", { num: num }, function(res) {
+                    $.each(res, function(guid) {
+                        $results.append("<p>" + guid + "</p>");
+                    });
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>
