@@ -1,0 +1,64 @@
+/* Welcome to Compass.
+ * In this file you should write your main styles. (or centralize your imports)
+ * Import this file using the following HTML or equivalent:
+ * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
+
+@import "compass/reset";
+@import "susy";
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+
+$total-columns  : 5;
+$column-width   : 4em;
+$gutter-width   : 1em;
+$grid-padding   : $gutter-width;
+
+$medium-columns  : 8;
+$large-columns  : 12;
+
+$font: "Open Sans", sans-serif;
+$fontsize: 16px;
+$lineheight: 18px;
+$gray: #333;
+
+$container-width: container-outer-width($large-columns);
+
+.container {
+    @include container;
+    overflow: hidden;
+}
+
+h1, h2, h3, h4 { margin: 1em 0; }
+h1 { font-size: 3em; }
+
+body {
+    font-family: $font;
+    font-size: $fontsize;
+
+    h1 {
+        margin: 0.4em 0 1em;
+    }
+
+    p {
+        margin: 1em 0 0;
+    }
+
+    fieldset {
+        border: 1px dotted $gray;
+        border-radius: 0.2em;
+        padding: 1em;
+
+        label {
+
+        }
+        input[type=text] {
+
+        }
+    }
+
+    .results {
+        padding: 1em;
+        border: 1px dotted $gray;
+        border-radius: 0.2em;
+    }
+
+}

@@ -1,47 +1,64 @@
 ﻿@{
     Layout = null;
 }
-
 <!DOCTYPE html>
-
 <html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
-</head>
-<body>
-    <div>
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <title>Index</title>
+        <link href="~/Content/stylesheets/screen.css" rel="stylesheet" media="screen"/>
+    </head>
+    <body>
         
-        <h1>Guids!</h1>
+        <div class="container" ng-app ng-controller="Guids">
         
-        <div id="form">
-            <label>How many guids do you want to see?</label>
-            <input id="num" type="text" name="num"/>
-            
-            <button>See Guids!</button>
+            <h1>Guids!</h1>
+        
+            <fieldset>
+                <legend>Guids</legend>
+
+                <label>How many guids do you want to see?</label>
+                <input ng-model="num" id="num" type="text" name="num"/>
+
+            </fieldset>
+            <p>
+                <button ng-click="fetch()">See Guids!</button>
+            </p>
+        
+            <div class="results">
+                <p ng-repeat="guid in guids">{{ guid }}</p>
+            </div>
+
         </div>
         
-        <span id="results"></span>
+        <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
+        <script>
+            typeof (angular) === 'undefined' && document.write("<script src='/Scripts/angular.min.js'></" + "script>");
+        </script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script>
+            typeof (jQuery) === 'undefined' && document.write("<script src='/Scripts/jquery-2.1.0.min.js'></" + "script>");
+        </script>
+        <script src="~/Scripts/jquery-2.1.0.min.js"></script>
+        <script>
+            function Guids($scope) {
+                $scope.guids = [];
+                $scope.num = 1;
 
-    </div>
-    <script src="~/Scripts/jquery-2.1.0.min.js"></script>
-    <script>
-        jQuery(function($) {
-            var $form = $("#form");
-            var $num = $form.find("#num");
-            var $results = $("#results");
-
-            $form.on('click', "button", function(e) {
-                var num = $num.val();
-                
-                $.post("@Url.HttpRouteUrl("DefaultApi", new { controller = "Guid", action="List" })", { num: num }, function(res) {
-                    $.each(res, function(guid) {
-                        $results.append("<p>" + guid + "</p>");
-                    });
-                });
-            });
-        });
-
-    </script>
-</body>
+                $scope.fetch = function() {
+                    $.getJSON("@Url.HttpRouteUrl("DefaultApi", new { controller = "Guid" })?n=" + $scope.num,
+                        //{ n: $scope.num },
+                        null,
+                        function (res) {
+                            $scope.guids = [];
+                            $.each(res, function (i, guid) {
+                                $scope.guids.push(guid);
+                            });
+                            $scope.$apply();
+                        }
+                    );
+                };
+            }
+        </script>
+    </body>
 </html>
