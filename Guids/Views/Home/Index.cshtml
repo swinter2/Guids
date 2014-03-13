@@ -1,4 +1,5 @@
-﻿@{
+﻿@model IEnumerable<Guids.Models.GuidModel>
+@{
     Layout = null;
 }
 <!DOCTYPE html>
@@ -16,82 +17,114 @@
         <div ng-controller="Guids">
             
             <fieldset>
+                <legend>Generate New Guid</legend>
+                <p>If paying by check, please make checks out to Carl Ashby.</p>
+
+                <button ng-click="generate()">Generate a New Guid (Cost £12)</button>
+                <p class="message" ng-show="generatedGuid">{{ generatedGuid }}</p>
+
+            </fieldset>
+
+            <fieldset>
                 <legend>Guid Recycling</legend>
+                <p>Please donate your existing guids here!</p>
 
                 <input type="text" name="guidToRecycle" ng-model="guidToRecycle" />
                 <button ng-click="recycle()">Recycle This Guid</button>
+                
                 <p ng-show="error" class="error" ng-model="error">{{ error }}</p>
+                <p ng-show="message" class="message" ng-model="message">{{ message }}</p>
 
             </fieldset>
-
+            
             <div class="results">
-                <h3>Recycled Guids</h3>
-                <p ng-repeat="guid in recycledGuids">{{ guid }}</p>
-            </div>
-        
-            <fieldset>
-                <legend>Guids</legend>
-
-                <label>How many guids do you want to see?</label>
-                <input ng-model="num" id="num" type="text" name="num"/>
-
-            </fieldset>
-            <p>
-                <button ng-click="fetch()">See Guids!</button>
-            </p>
-        
-            <div ng-show="guids" class="results">
-                <p ng-repeat="guid in guids">{{ guid }}<button class="button-copy" ng-click="copy()">Copy</button></p>
+                <h3>The Last Guids In The World</h3>
+                <h4>Only {{ count() }} left!</h4>
+                <p ng-repeat="guid in guids">{{ guid }} <button ng-click="borrow()">Borrow</button></p>
             </div>
 
         </div>
 
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
-        <script>
-            typeof (angular) === 'undefined' && document.write("<script src='/Scripts/angular.min.js'></" + "script>");
-        </script>
+        <script>typeof (angular) === 'undefined' && document.write("<script src='/Scripts/angular.min.js'></" + "script>");</script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-        <script>
-            typeof (jQuery) === 'undefined' && document.write("<script src='/Scripts/jquery-2.1.0.min.js'></" + "script>");
-        </script>
+        <script>typeof (jQuery) === 'undefined' && document.write("<script src='/Scripts/jquery-2.1.0.min.js'></" + "script>");</script>
         <script src="~/Scripts/jquery-2.1.0.min.js"></script>
         <script>
-            var guidUrl = "@Url.HttpRouteUrl("DefaultApi", new { controller = "Guid" })?n=";
             var guidPattern = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", 'i');
 
             function Guids($scope) {
-                $scope.guids = [];
-                $scope.num = 1;
+                $scope.guids = [
+                    @{
+                        var i = 0;
+                        var len = Model.Count();
+                        foreach (var g in Model)
+                        {
+                            @:@Html.Raw(string.Format("'{0}'{1}", g.Guid, i < len - 1 ? "," : string.Empty))
+                            i++;
+                        }
+                    }
+                ];
+                $scope.error = "";
+                $scope.message = "";
+                $scope.count = function() { return $scope.guids.length; };
+                $scope.guidToRecycle = "";
+                $scope.generatedGuid = "";
 
-                $scope.fetch = function () {
-                    $.getJSON(guidUrl + $scope.num,
-                        null,
-                        function (res) {
-                            $scope.guids = [];
-                            $.each(res, function (i, guid) {
-                                $scope.guids.push(guid);
+                $scope.generate = function () {
+                    $scope.error = "";
+                    $scope.message = "";
+                    $.getJSON('@Url.Action("Get", "Guid")', null,
+                        function(guid) {
+                            $scope.$apply(function() {
+                                $scope.generatedGuid = guid;
+                                $scope.guidToRecycle = guid;
                             });
-                            $scope.$apply();
                         }
                     );
                 };
 
-                $scope.recycledGuids = [];
-                $scope.guidToRecycle = "";
-                $scope.error = "";
-
-                $scope.recycle = function () {
+                $scope.recycle = function() {
                     if ($scope.guidToRecycle.match(guidPattern)) {
-                        $scope.recycledGuids.push($scope.guidToRecycle);
-                        $scope.guidToRecycle = "";
                         $scope.error = "";
+                        $.post('@Url.Action("Save", "Guid")',
+                        {guid: $scope.guidToRecycle},
+                        function (res) {
+                            $scope.$apply(function() {
+                                if (!res.error) {
+                                    $scope.guids.push(res.guid);
+                                    $scope.message = res.message;
+                                } else {
+                                    $scope.error = res.error;
+                                    $scope.message = "";
+                                }
+                            });
+                        });
                     } else {
-                        $scope.error = "Value entered must be a valid GUID.";
+                        $scope.error = "Please enter a valid Guid.";
                     }
                 };
 
-                $scope.copy = function () {
-                    $scope.guidToRecycle = this.guid;
+                @* Take a guid from the pool for borrowing! *@
+                $scope.borrow = function () {
+                    if (confirm("Are you sure that you want to take a Guid from the already dwindling reserve?")) {
+                        $.post('@Url.Action("Take", "Guid")',
+                            { guid: this.guid },
+                            function (res) {
+                                $scope.$apply(function() {
+                                    if (!res.error) {
+                                        $scope.message = res.message;
+                                        // remove this guid from the list.
+                                        var i = $scope.guids.indexOf(res.guid);
+                                        $scope.guids.splice(i, 1);
+                                    } else {
+                                        $scope.error = res.error || "Whoops, there was a problem.";
+                                        $scope.message = "";
+                                    }
+                                });
+                            });
+                        console.log(this);
+                    }
                 };
             }
         </script>

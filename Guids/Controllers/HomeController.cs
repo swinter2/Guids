@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Guids.Models;
 
 namespace Guids.Controllers
 {
@@ -13,7 +14,10 @@ namespace Guids.Controllers
 
         public ActionResult Index()
         {
-            return View();
+            var db = new ModelContext();
+
+            var model = db.Guids.ToList();
+            return View(model);
         }
 
     }

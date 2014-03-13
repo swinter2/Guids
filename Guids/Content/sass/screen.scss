@@ -23,6 +23,7 @@ $darkgray: #333;
 $gray: #666;
 $lightgray: #ddd;
 $blue: #046;
+$lightblue: #eef;
 $lightred: #fee;
 $red: #d00;
 
@@ -35,7 +36,6 @@ $container-width: container-outer-width($large-columns);
 
 .container {
     @include container;
-    overflow: hidden;
 }
 
 h1, h2, h3, h4 { margin: 1em 0; }
@@ -50,7 +50,7 @@ body {
         margin: 0.4em 0 1em;
     }
     p {
-        margin: 1em 0 0;
+        margin: 1em 0;
     }
 
     .error {
@@ -59,6 +59,14 @@ body {
         border-radius: 0.2em;
         background-color: $lightred;
         color: $red;
+        padding: 0.2em;
+    }
+    .message {
+        display: inline-block;
+        border: none;
+        border-radius: 0.2em;
+        background-color: $lightblue;
+        color: $blue;
         padding: 0.2em;
     }
 
@@ -102,6 +110,10 @@ body {
     .results {
         padding: 1em;
         @include default-border;
+
+        p {
+            margin: 1em 0 0;
+        }
 
         .button-copy {
             display: inline-block;
