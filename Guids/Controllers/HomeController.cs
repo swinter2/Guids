@@ -15,9 +15,9 @@ namespace Guids.Controllers
         public ActionResult Index()
         {
             var db = new ModelContext();
+            ViewBag.GuidCount = db.Guids.Count();
 
-            var model = db.Guids.ToList();
-            return View(model);
+            return View();
         }
 
     }

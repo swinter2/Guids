@@ -8,26 +8,25 @@ namespace Guids.Controllers
 {
     public class GuidController : Controller
     {
-        public JsonResult Get()
-        {
-            return Json(Guid.NewGuid(), JsonRequestBehavior.AllowGet);
-        }
-
         [HttpPost]
-        public JsonResult Take(Guid guid)
+        public JsonResult Borrow()
         {
             var db = new ModelContext();
-            var g = db.Guids.FirstOrDefault(f => f.Guid == guid);
 
-            if (g == null)
-                return Json(new { error = "Guid doesn't exist."});
+            var guid = db.Guids.FirstOrDefault();
+            if (guid == null)
+                return Json(new { error = "No Guids left!" });
 
-            db.Guids.Remove(g);
-            return Json(new { message = "Guid removed!", guid });
+            db.Guids.Remove(guid);
+            db.SaveChanges();
+
+            var count = db.Guids.Count();
+
+            return Json(new { message = "Guid borrowed!", guid = guid.Guid, count });
         }
 
         [HttpPost]
-        public JsonResult Save(Guid guid)
+        public JsonResult Donate(Guid guid)
         {
             // save the incoming guid to the database.
             var db = new ModelContext();
@@ -41,9 +40,9 @@ namespace Guids.Controllers
             db.Guids.Add(gg);
             db.SaveChanges();
 
-            // Return a list of all guids again so we can refresh the list.
-            //var model = db.Guids.Select(f => f.Guid);
-            return Json(new { message = "Guid donated successfully!", guid });
+            var count = db.Guids.Count();
+
+            return Json(new { message = "Guid donated successfully!", guid, count });
         }
     }
 }

@@ -4,6 +4,7 @@
  * <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css" /> */
 
 @import "compass/reset";
+@import "compass/css3/border-radius";
 @import "susy";
 @import url(http://fonts.googleapis.com/css?family=Open+Sans);
 
@@ -31,7 +32,7 @@ $container-width: container-outer-width($large-columns);
 
 @mixin default-border {
     border: 1px dotted $gray;
-    border-radius: 0.2em;
+    @include border-radius(0.2em, 0.2em);
 }
 
 .container {
@@ -56,7 +57,7 @@ body {
     .error {
         display: inline-block;
         border: none;
-        border-radius: 0.2em;
+        @include border-radius(0.2em, 0.2em);
         background-color: $lightred;
         color: $red;
         padding: 0.2em;
@@ -64,7 +65,7 @@ body {
     .message {
         display: inline-block;
         border: none;
-        border-radius: 0.2em;
+        @include border-radius(0.2em, 0.2em);
         background-color: $lightblue;
         color: $blue;
         padding: 0.2em;
@@ -72,6 +73,7 @@ body {
 
     fieldset {
         @include default-border;
+
         padding: 1em;
         margin: 1em 0;
 
@@ -87,7 +89,7 @@ body {
         input[type=text] {
             width: 40%;
             border: 1px solid $lightgray;
-            border-radius: 0.2em;
+            @include border-radius(0.2em, 0.2em);
             color: $darkgray;
             padding: 0.4em;
         }
