@@ -8,36 +8,39 @@
         <title>Guids!</title>
         <link href="~/Content/stylesheets/screen.css" rel="stylesheet" media="screen"/>
     </head>
-    <body class="container" ng-app>
-        
-        <h1>Guids!</h1>
-        <p>The world's Guids are in danger of running out!  If you have Guids to spare, please donate them here.</p>
+    <body>
+        <div class="loading">Loading...</div>
 
-        <div ng-controller="Guids">
+        <div class="container" ng-app>
+            <h1>Guids!</h1>
+            <p>The world's Guids are in danger of running out!  If you have Guids to spare, please donate them here.</p>
+
+            <div ng-controller="Guids">
             
-            <p ng-show="message" class="message" ng-model="message">{{ message }}</p>
-            <p ng-show="error" class="error" ng-model="error">{{ error }}</p>
+                <p ng-show="message" class="message" ng-model="message">{{ message }}</p>
+                <p ng-show="error" class="error" ng-model="error">{{ error }}</p>
 
-            <fieldset class="borrow">
-                <legend>Borrow Guid</legend>
-                <p>There are only {{ count }} Guids left in the world!</p>
-                <p>If paying by check, please make checks out to Carl Ashby.</p>
+                <fieldset class="borrow">
+                    <legend>Borrow Guid</legend>
+                    <p>There are only {{ count }} Guids left in the world!</p>
+                    <p>If paying by check, please make checks out to Carl Ashby.</p>
 
-                <button ng-click="borrow()">Borrow a Guid (Cost £12)</button>
-                <p class="message" ng-show="borrowedGuid">{{ borrowedGuid }} </p>
-                <p ng-show="borrowedGuid.indexOf('ff') > -1">Ooooh, that looks like a good one!  Better use it wisely.</p>
-            </fieldset>
+                    <button ng-click="borrow()">Borrow a Guid (Cost £12)</button>
+                    <p class="message" ng-show="borrowedGuid">{{ borrowedGuid }} </p>
+                    <p ng-show="borrowedGuid.indexOf('ff') > -1">Ooooh, that looks like a good one!  Better use it wisely.</p>
+                </fieldset>
 
-            <fieldset class="donate">
-                <legend>Guid Donation</legend>
-                <p>Please donate your existing guids here!</p>
+                <fieldset class="donate">
+                    <legend>Guid Donation</legend>
+                    <p>Please donate your existing guids here!</p>
 
-                <input type="text" name="guidToDonate" ng-model="guidToDonate" />
-                <button ng-click="donate()">Donate</button>
-                <p class="error" ng-show="validationError" ng-model="validationError">{{ validationError }}</p>
+                    <input type="text" name="guidToDonate" ng-model="guidToDonate" />
+                    <button ng-click="donate()">Donate</button>
+                    <p class="error" ng-show="validationError" ng-model="validationError">{{ validationError }}</p>
 
-            </fieldset>
-            
+                </fieldset>
+
+            </div>
         </div>
 
         <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.12/angular.min.js"></script>
@@ -47,6 +50,13 @@
         <script src="~/Scripts/jquery-2.1.0.min.js"></script>
         <script>
             var guidPattern = new RegExp("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", 'i');
+            var $loading = null;
+
+            jQuery(function($) {
+                var $loading = $(".loading");
+
+
+            });
 
             function Guids($scope) {
                 $scope.error = "";
@@ -59,9 +69,13 @@
                 $scope.donate = function() {
                     if ($scope.guidToDonate.match(guidPattern)) {
                         $scope.validationError = "";
+                        // AJAX loading.
+                        $
+
                         $.post('@Url.Action("Donate", "Guid")',
                             {guid: $scope.guidToDonate},
                             function (res) {
+                                // AJAX done loading.
                                 $scope.$apply(function() {
                                     if (!res.error) {
                                         $scope.message = res.message;
@@ -84,9 +98,11 @@
                 @* Take a guid from the pool for borrowing! *@
                 $scope.borrow = function () {
                     if (confirm("Are you sure that you want to take a Guid from the already dwindling reserve?")) {
+                        // AJAX loading.
                         $.post('@Url.Action("Borrow", "Guid")',
                             null,
                             function (res) {
+                                // AJAX done loading.
                                 $scope.$apply(function() {
                                     if (!res.error) {
                                         $scope.message = res.message;
@@ -107,7 +123,7 @@
                 i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
                     (i[r].q = i[r].q || []).push(arguments)
                 }, i[r].l = 1 * new Date(); a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+                    m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
             })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
             ga('create', 'UA-2003853-6', 'winterific.com');

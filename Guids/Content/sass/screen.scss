@@ -54,6 +54,15 @@ body {
         margin: 1em 0;
     }
 
+    .loading {
+        display: none;
+        position: absolute;
+        height: 100%;
+        width: 100%;
+        z-index: 1003;
+        background-color: gray;
+    }
+
     .error {
         display: inline-block;
         border: none;
